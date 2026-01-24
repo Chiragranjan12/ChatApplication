@@ -52,7 +52,13 @@ export default function AuthPage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Button variant="outline" className="w-full h-11 relative" disabled={isLoading}>
+            <Button 
+              variant="outline" 
+              className="w-full h-11 relative" 
+              disabled={isLoading}
+              onClick={handleLogin}
+              data-testid="button-google-login"
+            >
               <Chrome className="w-4 h-4 mr-2" />
               Continue with Google
             </Button>
