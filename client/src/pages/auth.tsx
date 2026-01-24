@@ -15,21 +15,16 @@ export default function AuthPage() {
   const login = useChatStore(state => state.login);
 
   const handleGoogleLogin = async () => {
-    setIsLoading(true);
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    login("Google User");
-    setIsLoading(false);
-    setLocation('/chat');
+    // In a real app, this would redirect to /api/auth/google
+    // Since we are in mockup mode, we'll simulate the redirect to Google's account picker
+    window.location.href = "https://accounts.google.com/o/oauth2/v2/auth?client_id=mock&redirect_uri=" + window.location.origin + "/chat&response_type=token&scope=email%20profile";
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleManualGoogleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!username.trim()) return;
     
     setIsLoading(true);
-    // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 800));
     
     login(username);
@@ -78,16 +73,16 @@ export default function AuthPage() {
                 <span className="w-full border-t" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">Or continue with username</span>
+                <span className="bg-card px-2 text-muted-foreground">Or connect with google account</span>
               </div>
             </div>
 
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form onSubmit={handleManualGoogleLogin} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="username">Google Email or Username</Label>
                 <Input 
                   id="username" 
-                  placeholder="e.g. creative_mind" 
+                  placeholder="name@gmail.com" 
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   className="h-11 bg-white/50 dark:bg-black/20"
@@ -95,7 +90,7 @@ export default function AuthPage() {
                 />
               </div>
               <Button type="submit" className="w-full h-11 text-base shadow-lg shadow-primary/20" disabled={isLoading}>
-                {isLoading ? 'Signing in...' : 'Enter Chat'}
+                {isLoading ? 'Connecting...' : 'Continue'}
               </Button>
             </form>
           </CardContent>
