@@ -93,9 +93,17 @@ export const useChatStore = create<ChatState>()(
         const { currentUser, activeRoomId, messages } = get();
         if (!currentUser || !activeRoomId) return;
 
+        // Basic Profanity Filter
+        const bannedWords = ['spam', 'abuse', 'hate', 'toxic'];
+        let filteredText = text;
+        bannedWords.forEach(word => {
+          const reg = new RegExp(word, 'gi');
+          filteredText = filteredText.replace(reg, '***');
+        });
+
         const newMessage: Message = {
           id: nanoid(),
-          text,
+          text: filteredText,
           senderId: currentUser.id,
           timestamp: Date.now(),
           roomId: activeRoomId,

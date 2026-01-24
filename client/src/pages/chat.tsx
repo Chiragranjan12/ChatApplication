@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Send, MoreVertical, Phone, Video, Info } from 'lucide-react';
+import { Send, MoreVertical, Phone, Video, Info, Flag, ShieldAlert } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
+import { SafetyGuard, ReportButton } from '@/components/safety-guard';
 
 export default function ChatPage() {
   const { messages, activeRoomId, rooms, currentUser, sendMessage } = useChatStore();
@@ -41,6 +42,7 @@ export default function ChatPage() {
 
   return (
     <div className="flex flex-col h-full bg-background/50 backdrop-blur-3xl">
+      <SafetyGuard />
       {/* Header */}
       <header className="h-16 border-b border-border flex items-center justify-between px-6 bg-white/50 dark:bg-black/20 backdrop-blur-md z-10">
         <div className="flex items-center gap-3">
@@ -112,7 +114,12 @@ export default function ChatPage() {
                   )}
                   
                   <div className={`flex flex-col max-w-[70%] ${isMe ? 'items-end' : 'items-start'}`}>
-                    {showAvatar && <span className="text-xs text-muted-foreground ml-1 mb-1">User {msg.senderId.slice(0,4)}</span>}
+                    {showAvatar && (
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs text-muted-foreground ml-1">User {msg.senderId.slice(0,4)}</span>
+                        {!isMe && <ReportButton />}
+                      </div>
+                    )}
                     <div
                       className={`px-4 py-2.5 rounded-2xl text-sm shadow-sm relative group
                         ${isMe 
