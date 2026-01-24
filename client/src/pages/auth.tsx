@@ -14,6 +14,16 @@ export default function AuthPage() {
   const [, setLocation] = useLocation();
   const login = useChatStore(state => state.login);
 
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    login("Google User");
+    setIsLoading(false);
+    setLocation('/chat');
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!username.trim()) return;
@@ -56,7 +66,7 @@ export default function AuthPage() {
               variant="outline" 
               className="w-full h-11 relative" 
               disabled={isLoading}
-              onClick={handleLogin}
+              onClick={handleGoogleLogin}
               data-testid="button-google-login"
             >
               <Chrome className="w-4 h-4 mr-2" />
