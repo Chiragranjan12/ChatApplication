@@ -1,0 +1,153 @@
+Act as a senior full-stack engineer and system architect.
+Build a modern, real-time chat web application using Spring Boot (Java) for the backend and the best possible frontend stack for fast rendering, responsiveness, and real-time UX.
+
+🔧 Backend (Spring Boot – Java)
+
+Use Spring Boot with:
+
+WebSocket + STOMP for real-time messaging
+
+Spring Security
+
+OAuth2 for Google Login
+
+Architecture:
+
+Clean layered architecture (Controller, Service, Repository)
+
+REST APIs + WebSocket endpoints
+
+Database:
+
+Use PostgreSQL / MySQL
+
+Store users, chat rooms, messages, room types
+
+Authentication:
+
+Google OAuth2 login
+
+Generate JWT after successful login
+
+Message handling:
+
+Persist messages for private & public rooms
+
+Anonymous users should not have persistent identity
+
+💬 Chat Types (Core Requirement)
+1️⃣ Public Chat Room
+
+Any logged-in user can join
+
+All online users can see and send messages
+
+Live user count
+
+Messages appear instantly
+
+2️⃣ Private Room Chat
+
+User can:
+
+Create a private room
+
+Invite another user via link or username
+
+Only invited users can access
+
+Messages are fully private
+
+3️⃣ Random Anonymous Chat
+
+Users enter without revealing identity
+
+System randomly pairs two users
+
+One-to-one real-time chat
+
+Option to:
+
+Disconnect
+
+Find a new stranger
+
+No message history stored after session ends
+
+🎨 Frontend (Choose Best for UX & Speed)
+
+Use React + Vite / Next.js
+
+Styling:
+
+Modern UI (Tailwind CSS / Material UI)
+
+Responsive (mobile + desktop)
+
+Pages:
+
+Landing page
+
+Google Login page
+
+Chat dashboard
+
+Public chat view
+
+Private room view
+
+Random anonymous chat view
+
+UI Quality:
+
+Clean layout
+
+Smooth animations
+
+Real-time message updates
+
+Modern chat bubbles & timestamps
+
+Should feel fast, clean, and engaging, similar in quality to popular real-time chat platforms (do NOT mention them by name)
+
+📜 Chat Guidelines & Safety
+
+Show community guidelines before entering chat:
+
+What is allowed
+
+What is not allowed
+
+Basic moderation:
+
+Block abusive words
+
+Report button
+
+Display rules clearly in UI
+
+⚙️ Additional Requirements
+
+High responsiveness
+
+Scalable WebSocket handling
+
+Proper error handling
+
+Clean, readable code
+
+Use best practices for security and performance
+
+📦 Deliverables Expected
+
+Backend code (Spring Boot)
+
+Frontend code
+
+Database schema
+
+WebSocket flow explanation
+
+Authentication flow explanation
+
+Deployment-ready setup
