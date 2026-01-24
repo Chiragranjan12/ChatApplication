@@ -18,8 +18,7 @@ export default function AuthPage() {
   const login = useChatStore(state => state.login);
 
   const MOCK_ACCOUNTS = [
-    { name: 'Alex Rivera', email: 'alex.rivera@gmail.com', avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&w=150&q=80' },
-    { name: 'Sarah Chen', email: 's.chen@design.co', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80' }
+    { name: 'Use my Google Account', email: 'Your device account will be used', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=user' }
   ];
 
   const handleGoogleLoginClick = () => {
