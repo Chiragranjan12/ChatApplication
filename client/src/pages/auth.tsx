@@ -18,10 +18,12 @@ export default function AuthPage() {
   const login = useChatStore(state => state.login);
 
   const MOCK_ACCOUNTS = [
-    { name: 'Use my Google Account', email: 'Your device account will be used', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=user' }
+    { name: 'John Doe', email: 'john.doe@gmail.com', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John' },
+    { name: 'Jane Smith', email: 'jane.smith@gmail.com', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jane' }
   ];
 
   const handleGoogleLoginClick = () => {
+    // Simulate real Google Account detection
     setIsLoading(true);
     setTimeout(() => {
       setStep('accounts');

@@ -11,14 +11,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { useChatStore } from '@/lib/mock-chat';
 
-export function SafetyGuard() {
-  const [open, setOpen] = React.useState(true);
+export function SafetyGuard({ openOverride, onOpenChange }: { openOverride?: boolean, onOpenChange?: (open: boolean) => void }) {
+  const [internalOpen, setInternalOpen] = React.useState(true);
   const currentUser = useChatStore(state => state.currentUser);
 
-  if (!currentUser) return null;
+  const isOpen = openOverride !== undefined ? openOverride : internalOpen;
+  const setOpen = onOpenChange !== undefined ? onOpenChange : setInternalOpen;
 
+  // We only auto-show guidelines if we're not manually overriding them
+  // and we have a user (though landing page uses it without user)
+  
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={isOpen} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-md glass border-none shadow-2xl">
         <DialogHeader>
           <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">

@@ -1,11 +1,16 @@
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Shield, Zap, Globe, MessageCircle } from 'lucide-react';
+import { SafetyGuard } from '@/components/safety-guard';
 
 export default function LandingPage() {
+  const [showGuidelines, setShowGuidelines] = React.useState(false);
+
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
+      <SafetyGuard openOverride={showGuidelines} onOpenChange={setShowGuidelines} />
       {/* Background Decor */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
         <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-primary/20 rounded-full blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-pulse" />
@@ -55,7 +60,12 @@ export default function LandingPage() {
                 Start Chatting Now <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
-            <Button variant="outline" size="lg" className="h-14 px-8 rounded-full text-lg bg-white/50 backdrop-blur-sm">
+            <Button 
+              variant="outline" 
+              size="lg" 
+              className="h-14 px-8 rounded-full text-lg bg-white/50 backdrop-blur-sm"
+              onClick={() => setShowGuidelines(true)}
+            >
               View Community Guidelines
             </Button>
           </motion.div>
