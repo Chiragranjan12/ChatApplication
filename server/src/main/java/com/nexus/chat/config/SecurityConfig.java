@@ -69,7 +69,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("*"));
+        String frontendUrl = System.getenv("FRONTEND_URL");
+        configuration.setAllowedOriginPatterns(frontendUrl != null && !frontendUrl.isEmpty() ? Arrays.asList(frontendUrl.split(",")) : List.of("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
