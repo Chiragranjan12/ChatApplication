@@ -73,8 +73,8 @@ shared/        → Shared types / schema
 ### 1. Clone Repository
 
 ```
-git clone https://github.com/yourusername/nexus-chat.git
-cd nexus-chat
+git clone https://github.com/chiragranjan12/ChatApplication.git
+cd ChatApplication
 ```
 
 ---
