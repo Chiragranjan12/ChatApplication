@@ -9,11 +9,9 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useChatStore } from '@/lib/mock-chat';
 
 export function SafetyGuard({ openOverride, onOpenChange }: { openOverride?: boolean, onOpenChange?: (open: boolean) => void }) {
   const [internalOpen, setInternalOpen] = React.useState(true);
-  const currentUser = useChatStore(state => state.currentUser);
 
   const isOpen = openOverride !== undefined ? openOverride : internalOpen;
   const setOpen = onOpenChange !== undefined ? onOpenChange : setInternalOpen;
