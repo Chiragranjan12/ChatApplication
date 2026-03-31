@@ -11,10 +11,10 @@ type PresenceCallback = (message: any) => void;
 type ConnectionCallback = () => void;
 type ErrorCallback = (error: Error) => void;
 
-// Use dev server URL in dev, origin-relative path in production
+// Use dev server URL in dev, backend URL from env var in production
 const WS_URL = import.meta.env.DEV
     ? 'http://localhost:5000/ws'
-    : `${window.location.origin}/ws`;
+    : `${import.meta.env.VITE_API_URL}/ws`;
 
 // --- Phase 8: Error monitoring thresholds ---
 const MAX_STOMP_ERRORS_BEFORE_RECONNECT = 3;
