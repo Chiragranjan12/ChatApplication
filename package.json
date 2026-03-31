@@ -8,7 +8,7 @@
     "dev:backend": "cd server && mvn spring-boot:run",
     "dev": "vite dev --port 5173",
     "build": "vite build",
-    "start": "vite preview",
+    "start": "vite preview --port $PORT --host",
     "check": "tsc",
     "db:push": "drizzle-kit push"
   },
