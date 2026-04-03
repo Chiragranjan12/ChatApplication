@@ -72,12 +72,16 @@ public class SecurityConfig {
         String frontendUrl = System.getenv("FRONTEND_URL");
 
         List<String> origins = new java.util.ArrayList<>();
+        // Production: Railway frontend
+        origins.add("https://chatapplication-production-145c.up.railway.app");
+        // Additional origins from env var (if set)
         if (frontendUrl != null && !frontendUrl.isEmpty()) {
             origins.addAll(Arrays.asList(frontendUrl.split(",")));
         }
-        // Always allow localhost for development
+        // Local development
         origins.add("http://localhost:5173");
         origins.add("http://localhost:3000");
+        origins.add("http://localhost:8080");
 
         configuration.setAllowedOriginPatterns(origins);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));

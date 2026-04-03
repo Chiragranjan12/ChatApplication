@@ -21,12 +21,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         String frontendUrl = System.getenv("FRONTEND_URL");
         java.util.List<String> origins = new java.util.ArrayList<>();
+        // Production: Railway frontend
+        origins.add("https://chatapplication-production-145c.up.railway.app");
+        // Additional origins from env var (if set)
         if (frontendUrl != null && !frontendUrl.isEmpty()) {
             java.util.Collections.addAll(origins, frontendUrl.split(","));
         }
-        // Always allow localhost for development
+        // Local development
         origins.add("http://localhost:5173");
         origins.add("http://localhost:3000");
+        origins.add("http://localhost:8080");
         String[] allowedOrigins = origins.toArray(new String[0]);
 
         registry.addEndpoint("/ws")
