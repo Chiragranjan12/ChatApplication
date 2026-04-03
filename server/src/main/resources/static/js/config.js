@@ -8,7 +8,7 @@ window.APP_CONFIG = {
     // For Railway/Render: set to your deployed backend URL, e.g.:
     //   "https://your-backend.up.railway.app"
     // For local dev or same-origin: leave as ""
-    API_URL: "",
+    API_URL: "https://chatapplication-6jyl.onrender.com",
 
     // WebSocket URL — auto-detected from API_URL
     // Override if needed (e.g. wss://your-backend.up.railway.app/ws)
