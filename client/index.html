@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Chat</title>
+    <meta name="description" content="NexusChat — Real-time communication platform for private communities and friend groups.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons (Vanilla version) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- SockJS and StompJS for Websockets -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+    
+    <!-- Tailwind CSS Script -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: ["class"],
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        border: "hsl(240 3.7% 15.9%)",
+                        input: "hsl(240 3.7% 15.9%)",
+                        ring: "hsl(346.8 77.2% 49.8%)",
+                        background: "hsl(240 10% 3.9%)",
+                        foreground: "hsl(0 0% 98%)",
+                        primary: {
+                            DEFAULT: "hsl(346.8 77.2% 49.8%)",
+                            foreground: "hsl(355.7 100% 97.3%)",
+                        },
+                        secondary: {
+                            DEFAULT: "hsl(240 3.7% 15.9%)",
+                            foreground: "hsl(0 0% 98%)",
+                        },
+                        destructive: {
+                            DEFAULT: "hsl(0 62.8% 30.6%)",
+                            foreground: "hsl(0 0% 98%)",
+                        },
+                        muted: {
+                            DEFAULT: "hsl(240 3.7% 15.9%)",
+                            foreground: "hsl(240 5% 64.9%)",
+                        },
+                        accent: {
+                            DEFAULT: "hsl(240 3.7% 15.9%)",
+                            foreground: "hsl(0 0% 98%)",
+                        },
+                        popover: {
+                            DEFAULT: "hsl(240 10% 3.9%)",
+                            foreground: "hsl(0 0% 98%)",
+                        },
+                        card: {
+                            DEFAULT: "hsl(240 10% 3.9%)",
+                            foreground: "hsl(0 0% 98%)",
+                        },
+                    },
+                    animation: {
+                        "accordion-down": "accordion-down 0.2s ease-out",
+                        "accordion-up": "accordion-up 0.2s ease-out",
+                        "float": "float 3s ease-in-out infinite",
+                    },
+                    keyframes: {
+                        "accordion-down": {
+                            from: { height: "0" },
+                            to: { height: "var(--radix-accordion-content-height)" },
+                        },
+                        "accordion-up": {
+                            from: { height: "var(--radix-accordion-content-height)" },
+                            to: { height: "0" },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body class="bg-background text-foreground h-screen w-screen overflow-hidden antialiased">
+    
+    <!-- Top-level Global Toast Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-[100] flex flex-col gap-2"></div>
+
+    <!-- The actual Application Root. Views will be swapped in and out of here -->
+    <div id="app-root" class="h-full w-full">
+        <!-- Default State = Loading -->
+        <div class="h-full w-full flex items-center justify-center">
+            <i data-lucide="loader-2" class="h-8 w-8 animate-spin text-primary"></i>
+        </div>
+    </div>
+
+    <!-- Scripts — config.js MUST load first -->
+    <script src="./js/config.js"></script>
+    <script src="./js/api.js"></script>
+    <script src="./js/state.js"></script>
+    <script src="./js/websocket.js"></script>
+    <script src="./js/app.js"></script>
+</body>
+</html>
