@@ -1,5 +1,5 @@
 // Vanilla JS WebSocket Service
-const WS_URL = window.location.origin + '/ws';
+const WS_URL = window.APP_CONFIG?.WS_URL || (window.location.origin + '/ws');
 const MAX_STOMP_ERRORS_BEFORE_RECONNECT = 3;
 const MAX_RECONNECT_ATTEMPTS = 5;
 const RECONNECT_DELAY_MS = 3000;
