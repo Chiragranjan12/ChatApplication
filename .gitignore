@@ -1,6 +1,24 @@
-node_modules
-dist
+# Build output
+server/target/
+
+# IDE
+.vscode/
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# OS
 .DS_Store
-server/public
-vite.config.ts.*
-*.tar.gz
+Thumbs.db
+
+# Logs
+*.log
+server/logs/
+
+# Local state
+.local/
+
+# Node (in case any remain)
+node_modules/
+dist/
