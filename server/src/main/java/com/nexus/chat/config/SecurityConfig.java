@@ -70,7 +70,16 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         String frontendUrl = System.getenv("FRONTEND_URL");
-        configuration.setAllowedOriginPatterns(frontendUrl != null && !frontendUrl.isEmpty() ? Arrays.asList(frontendUrl.split(",")) : List.of("*"));
+
+        List<String> origins = new java.util.ArrayList<>();
+        if (frontendUrl != null && !frontendUrl.isEmpty()) {
+            origins.addAll(Arrays.asList(frontendUrl.split(",")));
+        }
+        // Always allow localhost for development
+        origins.add("http://localhost:5173");
+        origins.add("http://localhost:3000");
+
+        configuration.setAllowedOriginPatterns(origins);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

@@ -20,7 +20,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         String frontendUrl = System.getenv("FRONTEND_URL");
-        String[] allowedOrigins = frontendUrl != null && !frontendUrl.isEmpty() ? frontendUrl.split(",") : new String[]{"*"};
+        java.util.List<String> origins = new java.util.ArrayList<>();
+        if (frontendUrl != null && !frontendUrl.isEmpty()) {
+            java.util.Collections.addAll(origins, frontendUrl.split(","));
+        }
+        // Always allow localhost for development
+        origins.add("http://localhost:5173");
+        origins.add("http://localhost:3000");
+        String[] allowedOrigins = origins.toArray(new String[0]);
 
         registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns(allowedOrigins)
