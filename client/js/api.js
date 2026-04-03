@@ -1,16 +1,16 @@
 // API Service for Spring Boot Backend Integration in Vanilla JS
 const API_BASE_URL = (window.APP_CONFIG?.API_URL || '') + '/api';
 
-const tokenManager = {
+window.tokenManager = {
     getToken: () => localStorage.getItem('jwt_token'),
     setToken: (token) => localStorage.setItem('jwt_token', token),
     removeToken: () => localStorage.removeItem('jwt_token'),
-    isAuthenticated: () => !!tokenManager.getToken()
+    isAuthenticated: () => !!window.tokenManager.getToken()
 };
 
 // Generic API request function
 async function apiRequest(endpoint, options = {}) {
-    const token = tokenManager.getToken();
+    const token = window.tokenManager.getToken();
     const headers = { 'Content-Type': 'application/json' };
 
     if (options.headers) {
@@ -42,18 +42,18 @@ window.api = {
         register: (data) => apiRequest('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
         verifyOtp: async (email, otp) => {
             const res = await apiRequest('/auth/verify-otp', { method: 'POST', body: JSON.stringify({ email, otp }) });
-            tokenManager.setToken(res.token);
+            window.tokenManager.setToken(res.token);
             return res;
         },
         resendOtp: (email) => apiRequest('/auth/resend-otp', { method: 'POST', body: JSON.stringify({ email }) }),
         login: async (data) => {
             const res = await apiRequest('/auth/login', { method: 'POST', body: JSON.stringify(data) });
-            tokenManager.setToken(res.token);
+            window.tokenManager.setToken(res.token);
             return res;
         },
         logout: async () => {
             await apiRequest('/auth/logout', { method: 'POST' });
-            tokenManager.removeToken();
+            window.tokenManager.removeToken();
         }
     },
     user: {
@@ -82,5 +82,3 @@ window.api = {
         getMatchingStatus: () => apiRequest('/random/queue/status')
     }
 };
-
-window.tokenManager = tokenManager;
