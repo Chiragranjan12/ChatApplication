@@ -1,0 +1,244 @@
+@layer base {
+  * {
+    border-color: hsl(217.2 32.6% 17.5%); /* Default to dark mode border */
+  }
+  body {
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: hsl(222 47% 11%);
+    color: hsl(210 40% 98%);
+  }
+  body ::selection {
+    background-color: rgba(124, 58, 237, 0.2); /* primary/20 */
+    color: hsl(250 80% 65%);
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    letter-spacing: -0.025em;
+  }
+}
+
+@layer utilities {
+  .glass {
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+  
+  .glass-card {
+    background-color: rgba(15, 23, 42, 0.8); /* slate-900/80 */
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(30, 41, 59, 0.5); /* slate-800/50 */
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+  }
+  .glass-card:hover {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  
+  .text-gradient {
+    background-image: linear-gradient(to bottom right, hsl(250 80% 65%), #9333ea);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Base custom standard styles */
+.hidden { display: none !important; }
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.hidden-fade {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease-in-out;
+}
+.visible-fade {
+    opacity: 1;
+    pointer-events: auto;
+    transition: opacity 0.2s ease-in-out;
+}
+
+/* ======================================
+   MODAL / OVERLAY
+   ====================================== */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.2s ease-out;
+}
+.modal-content {
+    background-color: hsl(222 47% 11%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    padding: 2rem;
+    max-width: 28rem;
+    width: 90%;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    animation: scaleIn 0.2s ease-out;
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* ======================================
+   TYPING INDICATOR
+   ====================================== */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 12px;
+    font-size: 0.75rem;
+    color: hsl(240 5% 64.9%);
+    font-style: italic;
+}
+.typing-dots {
+    display: inline-flex;
+    gap: 3px;
+    margin-left: 4px;
+}
+.typing-dots span {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: hsl(240 5% 64.9%);
+    animation: typingBounce 1.2s infinite;
+}
+.typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes typingBounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-4px); opacity: 1; }
+}
+
+/* ======================================
+   MESSAGE STYLES
+   ====================================== */
+.msg-bubble {
+    position: relative;
+}
+.msg-delete-btn {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background-color: hsl(0 62.8% 30.6%);
+    color: hsl(0 0% 98%);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    z-index: 5;
+}
+.msg-bubble:hover .msg-delete-btn {
+    opacity: 1;
+}
+.msg-delete-btn:hover {
+    background-color: hsl(0 72% 40%);
+    transform: scale(1.1);
+}
+.msg-delete-btn svg {
+    width: 12px;
+    height: 12px;
+}
+
+/* Avatar with initials fallback */
+.avatar-initials {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: hsl(0 0% 98%);
+    flex-shrink: 0;
+}
+
+/* ======================================
+   RANDOM CHAT
+   ====================================== */
+.pulse-ring {
+    position: relative;
+}
+.pulse-ring::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 2px solid hsl(346.8 77.2% 49.8%);
+    animation: pulseRing 1.5s ease-out infinite;
+}
+@keyframes pulseRing {
+    0% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.4); }
+}
+
+/* ======================================
+   DROPDOWN MENU
+   ====================================== */
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 40;
+    min-width: 200px;
+    padding: 0.25rem;
+    margin-top: 0.25rem;
+    background-color: hsl(222 47% 11%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    animation: scaleIn 0.15s ease-out;
+}
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    color: hsl(210 40% 98%);
+    border: none;
+    background: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+.dropdown-item:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+}
+.dropdown-item i, .dropdown-item svg {
+    width: 1rem;
+    height: 1rem;
+    color: hsl(240 5% 64.9%);
+}
