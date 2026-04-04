@@ -1,4 +1,7 @@
 // Application Controller - App.js
+console.log("🟢 APP.JS EXECUTING!");
+document.body.style.background = "green";
+
 const { api, tokenManager, websocketService, stateStore } = window;
 
 // --- UTILS ---

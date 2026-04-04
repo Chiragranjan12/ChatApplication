@@ -106,5 +106,10 @@
     <script src="js/state.js?v=2"></script>
     <script src="js/websocket.js?v=2"></script>
     <script src="js/app.js?v=2"></script>
+
+    <!-- Force spinner load so you know JS hasn't broken before app.js fires -->
+    <script>
+        if (window.lucide) { lucide.createIcons(); }
+    </script>
 </body>
 </html>
