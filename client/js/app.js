@@ -253,13 +253,75 @@ const UI = {
     // =============================================
     // AUTH VIEW
     // =============================================
-    renderAuth() {
+    renderAuth(mode = 'login', tempEmail = '') {
         this._currentView = 'auth';
+        
+        let formHtml = '';
+        if (mode === 'login') {
+            formHtml = `
+                <form id="login-form" class="space-y-4">
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Username</label>
+                        <input id="login-username" class="flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:outline-none" required />
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Password</label>
+                        <input id="login-password" type="password" class="flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:outline-none" required />
+                    </div>
+                    <button type="submit" class="w-full h-10 bg-primary text-primary-foreground font-medium rounded-md hover:bg-primary/90 transition-colors">
+                        Sign In
+                    </button>
+                    <div class="text-center mt-4">
+                        <button type="button" id="go-register" class="text-sm text-primary hover:underline bg-transparent border-0 cursor-pointer">Need an account? Sign Up</button>
+                    </div>
+                </form>
+            `;
+        } else if (mode === 'register') {
+            formHtml = `
+                <form id="register-form" class="space-y-4">
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Username</label>
+                        <input id="reg-username" class="flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:outline-none" required />
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Email</label>
+                        <input id="reg-email" type="email" class="flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:outline-none" required />
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Password</label>
+                        <input id="reg-password" type="password" class="flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:outline-none" required />
+                    </div>
+                    <button type="submit" class="w-full h-10 bg-primary text-primary-foreground font-medium rounded-md hover:bg-primary/90 transition-colors">
+                        Create Account
+                    </button>
+                    <div class="text-center mt-4">
+                        <button type="button" id="go-login" class="text-sm text-primary hover:underline bg-transparent border-0 cursor-pointer">Already have an account? Sign In</button>
+                    </div>
+                </form>
+            `;
+        } else if (mode === 'otp') {
+            formHtml = `
+                <form id="otp-form" class="space-y-4">
+                    <p class="text-sm text-center text-muted-foreground mb-4">We sent a verification code to <strong>${escapeHtml(tempEmail)}</strong>.</p>
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Verification Code (OTP)</label>
+                        <input id="otp-code" class="flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:outline-none" required />
+                    </div>
+                    <button type="submit" class="w-full h-10 bg-primary text-primary-foreground font-medium rounded-md hover:bg-primary/90 transition-colors">
+                        Verify & Login
+                    </button>
+                    <div class="text-center mt-4">
+                        <button type="button" id="go-login" class="text-sm text-primary hover:underline bg-transparent border-0 cursor-pointer">Back to Login</button>
+                    </div>
+                </form>
+            `;
+        }
+        
         this.root.innerHTML = `
             <div class="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
                 <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-background to-background"></div>
                 
-                <div class="glass-card w-full max-w-md p-8 rounded-xl z-10 relative">
+                <div class="glass-card w-full max-w-md p-8 rounded-xl z-10 relative animate-in fade-in duration-300">
                     <div class="text-center space-y-2 mb-8">
                         <div class="flex justify-center mb-4">
                             <div class="p-3 bg-primary/10 rounded-full">
@@ -270,36 +332,56 @@ const UI = {
                         <p class="text-sm text-muted-foreground">Connect with your team in real-time</p>
                     </div>
 
-                    <form id="login-form" class="space-y-4">
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium">Username</label>
-                            <input id="login-username" class="flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:outline-none" required />
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium">Password</label>
-                            <input id="login-password" type="password" class="flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:outline-none" required />
-                        </div>
-                        <button type="submit" class="w-full h-10 bg-primary text-primary-foreground font-medium rounded-md hover:bg-primary/90 transition-colors">
-                            Sign In
-                        </button>
-                    </form>
+                    ${formHtml}
                 </div>
             </div>
         `;
         lucide.createIcons();
 
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const username = document.getElementById('login-username').value;
-            const password = document.getElementById('login-password').value;
-            try {
-                UI.toast('Logging in...');
-                await api.auth.login({ username, password });
-                await App.initSession();
-            } catch (err) {
-                UI.toast('Login Failed', err.message);
-            }
-        });
+        if (mode === 'login') {
+            document.getElementById('login-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const username = document.getElementById('login-username').value;
+                const password = document.getElementById('login-password').value;
+                try {
+                    UI.toast('Logging in...');
+                    await api.auth.login({ username, password });
+                    await App.initSession();
+                } catch (err) {
+                    UI.toast('Login Failed', err.message);
+                }
+            });
+            document.getElementById('go-register').addEventListener('click', () => UI.renderAuth('register'));
+        } else if (mode === 'register') {
+            document.getElementById('register-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const username = document.getElementById('reg-username').value;
+                const email = document.getElementById('reg-email').value;
+                const password = document.getElementById('reg-password').value;
+                try {
+                    UI.toast('Creating account...');
+                    await api.auth.register({ username, email, password });
+                    UI.toast('Success', 'Check your email for the verification code.');
+                    UI.renderAuth('otp', email);
+                } catch (err) {
+                    UI.toast('Registration Failed', err.message);
+                }
+            });
+            document.getElementById('go-login').addEventListener('click', () => UI.renderAuth('login'));
+        } else if (mode === 'otp') {
+            document.getElementById('otp-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const otp = document.getElementById('otp-code').value;
+                try {
+                    UI.toast('Verifying...');
+                    await api.auth.verifyOtp(tempEmail, otp);
+                    await App.initSession();
+                } catch (err) {
+                    UI.toast('Verification Failed', err.message);
+                }
+            });
+            document.getElementById('go-login').addEventListener('click', () => UI.renderAuth('login'));
+        }
     },
 
     // =============================================
