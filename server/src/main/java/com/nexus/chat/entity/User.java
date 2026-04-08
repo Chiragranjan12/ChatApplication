@@ -3,10 +3,13 @@ package com.nexus.chat.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -23,7 +26,10 @@ import java.util.UUID;
         @Index(name = "idx_user_email", columnList = "email"),
         @Index(name = "idx_user_online", columnList = "is_online")
 })
-@Data
+@Getter
+@Setter
+@ToString(exclude = "messages")
+@EqualsAndHashCode(exclude = "messages")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -73,7 +79,7 @@ public class User {
     private int otpAttempts = 0;
 
     @OneToMany(mappedBy = "sender")
-    @JsonManagedReference
+    @JsonIgnore
     @Builder.Default
     private List<Message> messages = new ArrayList<>();
 

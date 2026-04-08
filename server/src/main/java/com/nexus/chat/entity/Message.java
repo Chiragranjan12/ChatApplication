@@ -3,10 +3,13 @@ package com.nexus.chat.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -16,7 +19,10 @@ import java.util.UUID;
     @Index(name = "idx_message_sender", columnList = "sender_id"),
     @Index(name = "idx_message_created_at", columnList = "created_at")
 })
-@Data
+@Getter
+@Setter
+@ToString(exclude = {"sender", "room"})
+@EqualsAndHashCode(exclude = {"sender", "room"})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -38,11 +44,12 @@ public class Message {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id", nullable = false)
-    @JsonBackReference
+    @JsonIgnore
     private User sender;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id", nullable = false)
+    @JsonIgnore
     private Room room;
     
     @Column(name = "is_edited")
