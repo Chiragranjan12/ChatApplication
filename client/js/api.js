@@ -1,5 +1,5 @@
 // API Service for Spring Boot Backend Integration in Vanilla JS
-const API_BASE_URL = (window.APP_CONFIG?.API_URL || '') + '/api';
+const API_BASE_URL = window.CONFIG.API_BASE_URL + '/api';
 
 window.tokenManager = {
     getToken: () => localStorage.getItem('jwt_token'),
