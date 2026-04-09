@@ -39,7 +39,11 @@ async function apiRequest(endpoint, options = {}) {
 // Global API Objects
 window.api = {
     auth: {
-        register: (data) => apiRequest('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
+        register: async (data) => {
+            const res = await apiRequest('/auth/register', { method: 'POST', body: JSON.stringify(data) });
+            if (res.token) window.tokenManager.setToken(res.token);
+            return res;
+        },
         verifyOtp: async (email, otp) => {
             const res = await apiRequest('/auth/verify-otp', { method: 'POST', body: JSON.stringify({ email, otp }) });
             window.tokenManager.setToken(res.token);

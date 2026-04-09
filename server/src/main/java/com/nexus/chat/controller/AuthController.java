@@ -43,13 +43,17 @@ public class AuthController {
                                 request.getPassword(),
                                 request.getEmail());
 
-                // Trigger OTP email — user must verify before they can log in
-                userService.generateAndSendOtp(user);
+                // Trigger OTP email bypass
+                // userService.generateAndSendOtp(user);
 
-                return ResponseEntity.status(HttpStatus.ACCEPTED).body(
-                        Map.of("message", "Registration successful! Check your email for an OTP to verify your account.",
-                               "email", user.getEmail())
-                );
+                UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
+                String token = jwtUtil.generateToken(userDetails);
+                userService.setUserOnline(user.getId(), true);
+
+                return ResponseEntity.status(HttpStatus.CREATED).body(AuthResponse.builder()
+                                .token(token)
+                                .user(userService.toDTO(user))
+                                .build());
         }
 
         @PostMapping("/verify-otp")

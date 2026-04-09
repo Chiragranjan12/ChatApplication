@@ -55,6 +55,7 @@ public class UserService {
                 .email(email)
                 .avatarUrl("https://api.dicebear.com/7.x/avataaars/svg?seed=" + username)
                 .isOnline(false)
+                .emailVerified(true)
                 .build();
 
         user.getRoles().add(userRole);

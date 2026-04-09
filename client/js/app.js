@@ -361,8 +361,8 @@ const UI = {
                 try {
                     UI.toast('Creating account...');
                     await api.auth.register({ username, email, password });
-                    UI.toast('Success', 'Check your email for the verification code.');
-                    UI.renderAuth('otp', email);
+                    UI.toast('Success', 'Account created successfully.');
+                    await App.initSession();
                 } catch (err) {
                     UI.toast('Registration Failed', err.message);
                 }
