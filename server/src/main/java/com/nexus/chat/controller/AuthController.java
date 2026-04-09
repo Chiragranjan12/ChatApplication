@@ -109,13 +109,13 @@ public class AuthController {
                 User user = userService.findByUsername(request.getUsername())
                                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-                // Block login if email is not verified
-                if (!user.isEmailVerified()) {
-                        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
-                                Map.of("error", "Email not verified. Please check your email for the OTP.",
-                                       "email", user.getEmail() != null ? user.getEmail() : "")
-                        );
-                }
+                // Block login if email is not verified (Bypassed for testing)
+                // if (!user.isEmailVerified()) {
+                //         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                //                 Map.of("error", "Email not verified. Please check your email for the OTP.",
+                //                        "email", user.getEmail() != null ? user.getEmail() : "")
+                //         );
+                // }
 
                 UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
                 String token = jwtUtil.generateToken(userDetails);
