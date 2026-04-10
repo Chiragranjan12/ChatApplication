@@ -57,4 +57,24 @@ public class UserController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @PutMapping("/me")
+    @Transactional
+    public ResponseEntity<UserDTO> updateProfile(
+            @RequestBody Map<String, String> body,
+            @NonNull Authentication authentication) {
+        return userService.findByUsername(authentication.getName())
+                .map(user -> {
+                    if (body.containsKey("username")) {
+                        user.setUsername(body.get("username"));
+                    }
+                    if (body.containsKey("avatarUrl")) {
+                        user.setAvatarUrl(body.get("avatarUrl"));
+                    }
+                    // userRepository implicitly saves if transactional, but we can do it explicitly
+                    // Wait, we don't have userRepository here so let the transactional context persist properties.
+                    return ResponseEntity.ok(userService.toDTO(user));
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
 }

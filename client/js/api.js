@@ -74,7 +74,8 @@ window.api = {
         createPrivateGroup: (name) => apiRequest('/rooms/private', { method: 'POST', body: JSON.stringify({ name }) }),
         joinRoom: (roomId) => apiRequest(`/rooms/${roomId}/join`, { method: 'POST' }),
         joinRoomByInvite: (inviteCode) => apiRequest(`/rooms/join`, { method: 'POST', body: JSON.stringify({ inviteCode }) }),
-        leaveRoom: (roomId) => apiRequest(`/rooms/${roomId}/leave`, { method: 'POST' })
+        leaveRoom: (roomId) => apiRequest(`/rooms/${roomId}/leave`, { method: 'POST' }),
+        kickUser: (roomId, userId) => apiRequest(`/rooms/${roomId}/kick/${userId}`, { method: 'POST' })
     },
     message: {
         getRoomMessages: (roomId) => apiRequest(`/messages/room/${roomId}`),

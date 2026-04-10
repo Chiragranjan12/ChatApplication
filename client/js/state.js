@@ -114,6 +114,31 @@ class AppState {
         this.state.chat.typingUsers[roomId] = Array.from(typingList);
         this.notify();
     }
+
+    handleRoomEvent(roomId, event) {
+        if (!this.state.chat.rooms) return;
+        const roomIndex = this.state.chat.rooms.findIndex(r => r.id === roomId);
+        if (roomIndex === -1) return;
+
+        const room = { ...this.state.chat.rooms[roomIndex] };
+
+        if (event.type === 'USER_JOINED') {
+            room.memberCount = (room.memberCount || 0) + 1;
+            if (room.members && event.user) {
+                if (!room.members.some(m => m.id === event.user.id)) room.members.push(event.user);
+            }
+        } else if (event.type === 'USER_LEFT') {
+            room.memberCount = Math.max(0, (room.memberCount || 1) - 1);
+            if (room.members && event.userId) {
+                room.members = room.members.filter(m => m.id !== event.userId);
+            }
+        }
+
+        const newRooms = [...this.state.chat.rooms];
+        newRooms[roomIndex] = room;
+        
+        this.setChat({ rooms: newRooms });
+    }
 }
 
 window.stateStore = new AppState();

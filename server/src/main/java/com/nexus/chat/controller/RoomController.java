@@ -186,4 +186,18 @@ public class RoomController {
                 })
                 .orElse(ResponseEntity.badRequest().build());
     }
+
+    @PostMapping("/{id}/kick/{userIdToKick}")
+    @Transactional
+    public ResponseEntity<Map<String, String>> kickUser(
+            @NonNull @PathVariable UUID id,
+            @NonNull @PathVariable UUID userIdToKick,
+            @NonNull Authentication authentication) {
+        return userService.findByUsername(authentication.getName())
+                .map(user -> {
+                    roomService.kickUser(id, userIdToKick, user.getId());
+                    return ResponseEntity.ok(Map.of("message", "User kicked successfully"));
+                })
+                .orElse(ResponseEntity.badRequest().build());
+    }
 }

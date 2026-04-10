@@ -149,17 +149,25 @@ const UI = {
                     </div>
 
                     <!-- Public tab -->
-                    <form id="create-public-form" class="space-y-4">
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium">Channel Name</label>
-                            <input id="public-name" class="flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:outline-none" placeholder="e.g. general, random" required />
+                    <div id="create-public-container">
+                        <form id="create-public-form" class="space-y-4">
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium">Channel Name</label>
+                                <input id="public-name" class="flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:outline-none" placeholder="e.g. general, random" required />
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium">Description (optional)</label>
+                                <input id="public-desc" class="flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:outline-none" placeholder="What's this channel about?" />
+                            </div>
+                            <button type="submit" class="w-full h-10 bg-primary text-primary-foreground font-medium rounded-md hover:bg-primary/90 transition-colors">Create Channel</button>
+                        </form>
+                        <div class="mt-4 border-t pt-4">
+                            <h3 class="text-sm font-semibold mb-2">Join Existing Channel</h3>
+                            <div id="public-rooms-list" class="space-y-2 max-h-40 overflow-y-auto pr-2">
+                                <div class="text-center py-2"><i data-lucide="loader-2" class="w-4 h-4 animate-spin text-muted-foreground mx-auto"></i></div>
+                            </div>
                         </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium">Description (optional)</label>
-                            <input id="public-desc" class="flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:outline-none" placeholder="What's this channel about?" />
-                        </div>
-                        <button type="submit" class="w-full h-10 bg-primary text-primary-foreground font-medium rounded-md hover:bg-primary/90 transition-colors">Create Channel</button>
-                    </form>
+                    </div>
 
                     <!-- Private tab (hidden initially) -->
                     <form id="create-private-form" class="space-y-4 hidden">
@@ -190,8 +198,8 @@ const UI = {
 
         // Tab switching
         const tabs = overlay.querySelectorAll('.room-tab');
-        const forms = {
-            public: document.getElementById('create-public-form'),
+        const sections = {
+            public: document.getElementById('create-public-container'),
             private: document.getElementById('create-private-form'),
             invite: document.getElementById('join-invite-form'),
         };
@@ -201,9 +209,34 @@ const UI = {
                 tabs.forEach(t => { t.classList.remove('bg-primary', 'text-primary-foreground'); t.classList.add('text-muted-foreground'); });
                 tab.classList.add('bg-primary', 'text-primary-foreground');
                 tab.classList.remove('text-muted-foreground');
-                Object.values(forms).forEach(f => f.classList.add('hidden'));
-                forms[target].classList.remove('hidden');
+                Object.values(sections).forEach(s => s.classList.add('hidden'));
+                sections[target].classList.remove('hidden');
             });
+        });
+
+        // Load public rooms
+        api.room.getPublicRooms().then(publicRooms => {
+            const listEl = document.getElementById('public-rooms-list');
+            const joinedIds = new Set(stateStore.state.chat.rooms.map(r => r.id));
+            const availableRooms = publicRooms.filter(r => !joinedIds.has(r.id));
+            
+            if (availableRooms.length === 0) {
+                listEl.innerHTML = '<p class="text-xs text-muted-foreground text-center py-2">No public channels available to join</p>';
+                return;
+            }
+            
+            listEl.innerHTML = availableRooms.map(r => `
+                <div class="flex items-center justify-between p-2 hover:bg-secondary rounded-md text-sm">
+                    <div>
+                        <span class="font-medium flex items-center gap-1"><i data-lucide="hash" class="w-3 h-3 text-primary"></i> ${escapeHtml(r.name)}</span>
+                        ${r.description ? `<p class="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">${escapeHtml(r.description)}</p>` : ''}
+                    </div>
+                    <button onclick="App.joinPublicRoom('${r.id}', this)" class="shrink-0 text-xs bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground px-3 py-1 rounded transition-colors font-medium">Join</button>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }).catch(err => {
+            document.getElementById('public-rooms-list').innerHTML = '<p class="text-xs text-destructive text-center py-2">Failed to load channels</p>';
         });
 
         // Public channel creation
@@ -449,14 +482,17 @@ const UI = {
                         <!-- Rooms render here -->
                     </div>
                     
-                    <div class="p-4 border-t bg-muted/30">
+                    <div class="p-4 border-t bg-muted/30 group relative">
                         <div class="flex items-center gap-3">
                             ${renderAvatar(user.avatarUrl, user.username, 'w-10 h-10')}
                             <div class="flex flex-col overflow-hidden">
                                 <span class="font-medium text-sm truncate">${escapeHtml(user.username)}</span>
                                 <span class="text-xs text-muted-foreground truncate">${escapeHtml(user.email || 'No email set')}</span>
                             </div>
-                            <button id="logout-btn" class="ml-auto p-2 hover:bg-destructive/10 hover:text-destructive rounded-md transition-colors">
+                            <button onclick="App.showProfileModal()" class="ml-auto p-2 hover:bg-accent rounded-md transition-colors" title="Edit Profile">
+                                <i data-lucide="edit-2" class="w-4 h-4 text-muted-foreground"></i>
+                            </button>
+                            <button id="logout-btn" class="p-2 hover:bg-destructive/10 hover:text-destructive rounded-md transition-colors" title="Logout">
                                 <i data-lucide="log-out" class="w-4 h-4"></i>
                             </button>
                         </div>
@@ -567,7 +603,7 @@ const UI = {
         domArea.innerHTML = `
             <!-- Header -->
             <div class="border-b px-6 py-4 flex items-center justify-between glass-card z-10 sticky top-0">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3 cursor-pointer hover:bg-accent/50 p-2 rounded-md transition" onclick="App.showMembersModal('${activeRoom.id}')">
                     <div class="p-2 bg-primary/10 rounded-lg">
                         <i data-lucide="${typeIcon}" class="w-5 h-5 text-primary"></i>
                     </div>
@@ -575,6 +611,16 @@ const UI = {
                         <h2 class="font-bold text-lg font-display tracking-tight">${escapeHtml(activeRoom.name)}</h2>
                         <p class="text-xs text-muted-foreground">${activeRoom.memberCount || activeRoom.members?.length || 0} members</p>
                     </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    ${activeRoom.createdBy === state.auth.currentUser.id ? `
+                        <button onclick="App.deleteRoom('${activeRoom.id}')" class="p-2 text-destructive hover:bg-destructive/10 rounded-md transition-colors" title="Delete Room">
+                            <i data-lucide="trash-2" class="w-5 h-5"></i>
+                        </button>
+                    ` : ''}
+                    <button onclick="App.leaveRoom('${activeRoom.id}')" class="p-2 text-muted-foreground hover:bg-accent rounded-md transition-colors" title="Leave Room">
+                        <i data-lucide="log-out" class="w-5 h-5"></i>
+                    </button>
                 </div>
             </div>
             
@@ -620,6 +666,19 @@ const UI = {
         });
 
         this.updateMessages();
+    },
+
+    updateRoomHeader() {
+        const state = stateStore.state;
+        const activeRoom = state.chat.rooms.find(r => r.id === state.chat.activeRoomId);
+        
+        const headerEl = document.getElementById('chat-area')?.querySelector('div.border-b.px-6.py-4');
+        if (!headerEl || !activeRoom) return;
+
+        const countEl = headerEl.querySelector('p.text-xs.text-muted-foreground');
+        if (countEl) {
+            countEl.textContent = `${activeRoom.memberCount || activeRoom.members?.length || 0} members`;
+        }
     },
 
     // =============================================
@@ -919,6 +978,7 @@ const App = {
                             UI.renderActiveRoom();
                         } else {
                             UI.updateMessages();
+                            UI.updateRoomHeader();
                         }
                     }
                 }
@@ -960,11 +1020,11 @@ const App = {
         // Subscribe to match queue for random chat
         websocketService.subscribeToMatchQueue(event => {
             console.log("Match event", event);
-            if (event.status === 'MATCHED' && event.roomId) {
+            if (event.type === 'MATCH_FOUND' && event.roomId) {
                 // We got matched — load the room
                 stateStore.setChat({ randomState: 'connected' });
                 App.selectRoom(event.roomId);
-            } else if (event.status === 'DISCONNECTED') {
+            } else if (event.type === 'PARTNER_SKIPPED' || event.type === 'PARTNER_LEFT') {
                 stateStore.setChat({ randomState: 'disconnected' });
             }
         });
@@ -1004,6 +1064,8 @@ const App = {
                 const msgs = (stateStore.state.chat.messages[roomId] || []).map(m => m.id === wsEvent.message.id ? wsEvent.message : m);
                 const messagesObj = { ...stateStore.state.chat.messages, [roomId]: msgs };
                 stateStore.setChat({ messages: messagesObj });
+            } else if (wsEvent.type === 'USER_JOINED' || wsEvent.type === 'USER_LEFT') {
+                stateStore.handleRoomEvent(roomId, wsEvent);
             } else {
                 stateStore.addMessage(wsEvent);
             }
@@ -1048,6 +1110,100 @@ const App = {
             UI.toast('Message Deleted');
         } catch (err) {
             UI.toast('Error', err.message);
+        }
+    },
+
+    // --- ROOM ACTIONS ---
+    async leaveRoom(roomId) {
+        if (!confirm('Are you sure you want to leave this room?')) return;
+        try {
+            await api.room.leaveRoom(roomId);
+            const state = stateStore.state;
+            const newRooms = state.chat.rooms.filter(r => r.id !== roomId);
+            stateStore.setChat({ rooms: newRooms, activeRoomId: null });
+            UI.toast('Left Room');
+            // Re-render empty state manually
+            const domArea = document.getElementById('chat-area');
+            if (domArea) {
+                domArea.innerHTML = `<div class="flex-1 flex items-center justify-center text-muted-foreground p-4 text-center">...</div>`;
+            }
+        } catch (e) {
+            UI.toast('Error', e.message);
+        }
+    },
+
+    async deleteRoom(roomId) {
+        if (!confirm('Are you sure you want to delete this room? This cannot be undone.')) return;
+        try {
+            // Check if there is an endpoint for room deletion, we assume api request to DELETE /api/rooms/:id
+            await apiRequest(`/rooms/${roomId}`, { method: 'DELETE' });
+            const state = stateStore.state;
+            const newRooms = state.chat.rooms.filter(r => r.id !== roomId);
+            stateStore.setChat({ rooms: newRooms, activeRoomId: null });
+            UI.toast('Room Deleted');
+            const domArea = document.getElementById('chat-area');
+            if (domArea) {
+                domArea.innerHTML = `<div class="flex-1 flex items-center justify-center text-muted-foreground p-4 text-center">...</div>`;
+            }
+        } catch (e) {
+            UI.toast('Error', e.message);
+        }
+    },
+
+    showMembersModal(roomId) {
+        const state = stateStore.state;
+        const room = state.chat.rooms.find(r => r.id === roomId);
+        if (!room) return;
+
+        const isOwner = room.createdBy === state.auth.currentUser.id;
+        const membersList = (room.members || []).map(m => `
+            <div class="flex items-center justify-between p-2 hover:bg-accent rounded-md">
+                <div class="flex items-center gap-3">
+                    ${renderAvatar(m.avatarUrl, m.username, 'w-8 h-8')}
+                    <span class="text-sm font-medium">${escapeHtml(m.username)} ${room.createdBy === m.id ? '<span class="text-[10px] bg-primary/20 text-primary px-1.5 py-0.5 rounded ml-1">Owner</span>' : ''}</span>
+                </div>
+                ${isOwner && m.id !== state.auth.currentUser.id ? `
+                    <button onclick="App.kickUser('${roomId}', '${m.id}')" class="text-xs text-destructive hover:bg-destructive/10 px-2 py-1 rounded transition">Kick</button>
+                ` : ''}
+            </div>
+        `).join('') || '<p class="text-sm text-muted-foreground">No members found</p>';
+
+        const overlay = createEl(`
+            <div class="modal-overlay" id="members-modal">
+                <div class="modal-content max-w-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-bold">Room Members</h2>
+                        <button onclick="this.closest('.modal-overlay').remove()" class="p-1 hover:bg-secondary rounded-md">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <div class="space-y-1 max-h-[300px] overflow-y-auto pr-2">
+                        ${membersList}
+                    </div>
+                    ${room.inviteCode ? `
+                        <div class="mt-6 pt-4 border-t">
+                            <p class="text-xs text-muted-foreground mb-1">Invite Code</p>
+                            <div class="flex items-center gap-2 bg-secondary p-2 rounded-md">
+                                <code class="text-xs font-mono font-bold text-foreground flex-1 text-center">${room.inviteCode}</code>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `);
+        document.body.appendChild(overlay);
+        lucide.createIcons();
+    },
+
+    async kickUser(roomId, userId) {
+        if (!confirm('Kick this user?')) return;
+        try {
+            await api.room.kickUser(roomId, userId);
+            UI.toast('User Kicked');
+            document.getElementById('members-modal')?.remove();
+            // Member list will automatically update via WebSocket USER_LEFT event
+        } catch (e) {
+            UI.toast('Error', e.message);
         }
     },
 
@@ -1107,6 +1263,80 @@ const App = {
             websocketService.unsubscribeFromRoom(currentRoomId);
         }
         await this.findRandomMatch();
+    },
+
+    showProfileModal() {
+        const user = stateStore.state.auth.currentUser;
+        if (!user) return;
+
+        const overlay = createEl(`
+            <div class="modal-overlay" id="profile-modal">
+                <div class="modal-content max-w-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-bold">Edit Profile</h2>
+                        <button onclick="this.closest('.modal-overlay').remove()" class="p-1 hover:bg-secondary rounded-md">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <form id="edit-profile-form" class="space-y-4">
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium">Username</label>
+                            <input id="profile-username" value="${escapeHtml(user.username)}" class="flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:outline-none" required />
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium">Avatar URL</label>
+                            <input id="profile-avatar" value="${user.avatarUrl ? escapeHtml(user.avatarUrl) : ''}" placeholder="https://..." class="flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:outline-none" />
+                        </div>
+                        <button type="submit" class="w-full h-10 bg-primary text-primary-foreground font-medium rounded-md hover:bg-primary/90 transition-colors">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        `);
+        document.body.appendChild(overlay);
+        lucide.createIcons();
+
+        document.getElementById('edit-profile-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = overlay.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            try {
+                const username = document.getElementById('profile-username').value.trim();
+                const avatarUrl = document.getElementById('profile-avatar').value.trim();
+                
+                const updatedUser = await api.user.updateProfile({ username, avatarUrl });
+                stateStore.setCurrentUser(updatedUser);
+                UI.toast('Success', 'Profile updated!');
+                overlay.remove();
+                // Trigger full re-render of sidebar
+                UI.renderChatLayout();
+            } catch (err) {
+                UI.toast('Error', err.message);
+                btn.disabled = false;
+            }
+        });
+    },
+
+    async joinPublicRoom(roomId, btn) {
+        btn.disabled = true;
+        const originalText = btn.textContent;
+        btn.innerHTML = '<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i>';
+        lucide.createIcons();
+        try {
+            const room = await api.room.joinRoom(roomId);
+            const rooms = [...stateStore.state.chat.rooms, room];
+            stateStore.setChat({ rooms });
+            
+            // Re-render chat layout manually or just update list and select room
+            UI.updateRoomList();
+            App.selectRoom(room.id);
+            
+            document.getElementById('create-room-overlay')?.remove();
+            UI.toast('Joined Channel', `Welcome to ${room.name}`);
+        } catch (err) {
+            UI.toast('Error', err.message);
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
     }
 };
 

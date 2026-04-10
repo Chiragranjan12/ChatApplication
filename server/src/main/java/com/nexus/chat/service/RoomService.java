@@ -206,6 +206,26 @@ public class RoomService {
                 java.util.Map.of("type", "ROOM_DELETED", "roomId", roomId.toString()));
     }
 
+    @Transactional
+    public void kickUser(@NonNull UUID roomId, @NonNull UUID userIdToKick, @NonNull UUID requestingUserId) {
+        Room room = roomRepository.findByIdAndIsDeletedFalse(roomId)
+                .orElseThrow(() -> new RoomNotFoundException("Room not found with id: " + roomId));
+
+        if (room.getCreatedBy() == null || !room.getCreatedBy().getId().equals(requestingUserId)) {
+            throw new UnauthorizedException("Only room creator can kick users");
+        }
+
+        if (room.getCreatedBy().getId().equals(userIdToKick)) {
+            throw new UnauthorizedException("Cannot kick the room owner");
+        }
+
+        roomMemberRepository.findByRoomIdAndUserId(roomId, userIdToKick)
+                .ifPresent(roomMemberRepository::delete);
+
+        messagingTemplate.convertAndSend("/topic/room/" + roomId,
+                java.util.Map.of("type", "USER_LEFT", "userId", userIdToKick.toString()));
+    }
+
     @Transactional(readOnly = true)
     public boolean isUserInRoom(@NonNull UUID roomId, @NonNull UUID userId) {
         return roomMemberRepository.existsByRoomIdAndUserId(roomId, userId);
