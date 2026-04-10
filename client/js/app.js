@@ -209,44 +209,64 @@ const UI = {
         // Public channel creation
         forms.public.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const btn = forms.public.querySelector('button[type="submit"]');
+            btn.disabled = true;
             const name = document.getElementById('public-name').value.trim();
             const desc = document.getElementById('public-desc').value.trim();
-            if (!name) return;
+            if (!name) { btn.disabled = false; return; }
             try {
                 const room = await api.room.createRoom({ name, type: 'PUBLIC', description: desc || null });
                 const rooms = [...stateStore.state.chat.rooms, room];
                 stateStore.setChat({ rooms });
                 overlay.remove();
                 UI.toast('Channel Created', `#${name} is ready!`);
-            } catch (err) { UI.toast('Error', err.message); }
+            } catch (err) { 
+                UI.toast('Error', err.message); 
+                btn.disabled = false;
+            }
         });
 
         // Private group creation
         forms.private.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const btn = forms.private.querySelector('button[type="submit"]');
+            btn.disabled = true;
             const name = document.getElementById('private-name').value.trim();
-            if (!name) return;
+            if (!name) { btn.disabled = false; return; }
             try {
                 const room = await api.room.createPrivateGroup(name);
                 const rooms = [...stateStore.state.chat.rooms, room];
                 stateStore.setChat({ rooms });
                 overlay.remove();
-                UI.toast('Group Created', `${name} is ready!`);
-            } catch (err) { UI.toast('Error', err.message); }
+                
+                // Show invite code prominently
+                UI.toast('Private Group Created', `Invite Code: ${room.inviteCode}`);
+                
+                // Show an alert explicitly for the invite code just in case they miss the toast
+                alert(`Successfully created private group: ${name}\n\nInvite Code: ${room.inviteCode}\n\nShare this code with others so they can join!`);
+            } catch (err) { 
+                UI.toast('Error', err.message); 
+                btn.disabled = false;
+            }
         });
 
         // Join by invite code
         forms.invite.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const btn = forms.invite.querySelector('button[type="submit"]');
+            btn.disabled = true;
             const code = document.getElementById('invite-code').value.trim();
-            if (!code) return;
+            if (!code) { btn.disabled = false; return; }
             try {
                 const room = await api.room.joinRoomByInvite(code);
                 const rooms = [...stateStore.state.chat.rooms, room];
                 stateStore.setChat({ rooms });
                 overlay.remove();
                 UI.toast('Joined!', `Welcome to ${room.name}`);
-            } catch (err) { UI.toast('Error', err.message); }
+            } catch (err) { 
+                UI.toast('Error', err.message); 
+                btn.disabled = false;
+            }
         });
     },
 
