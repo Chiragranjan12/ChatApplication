@@ -1,24 +1,437 @@
-# Build output
+# =============================================================================
+# NEXUS CHAT APPLICATION - COMPREHENSIVE .GITIGNORE
+# =============================================================================
+# This file ignores files that should NOT be committed to version control
+# Organized by category with explanations for each section
+# =============================================================================
+
+
+# =============================================================================
+# SECTION 1: BUILD & COMPILATION OUTPUT
+# =============================================================================
+# Maven build output (compiled classes, JARs, WARs)
 server/target/
 
-# IDE
+# Gradle build output (if using Gradle instead of Maven)
+server/build/
+
+# Vite/React build output (production-ready static files)
+client/dist/
+
+# Legacy React build output
+client/build/
+
+# Compiled Java archives - don't commit JARs, build from source
+*.jar
+*.war
+*.ear
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# .NET build output
+bin/
+obj/
+
+
+# =============================================================================
+# SECTION 2: DEPENDENCIES & PACKAGE MANAGERS
+# =============================================================================
+# Node.js dependencies - huge folder, should be installed from package.json
+client/node_modules/
+
+# npm debug logs (created during npm install)
+npm-debug.log*
+npm-debug.log.* 
+
+# Yarn debug logs
+yarn-debug.log*
+yarn-debug.log.*
+
+# Yarn error logs
+yarn-error.log*
+
+# Yarn lock file - RECOMMENDATION: COMMIT for production
+# Ensures reproducible builds across machines
+# yarn.lock
+
+# npm lock file
+# package-lock.json
+
+# npm cache directory
+.npm/
+
+# pnpm lock file (if using pnpm)
+# pnpm-lock.yaml
+
+# Bower components (legacy)
+bower_components/
+
+
+# =============================================================================
+# SECTION 3: IDE & EDITOR FILES
+# =============================================================================
+# VS Code - editor settings, extensions, launch configs
 .vscode/
+.vscode-extensions/
+.vsix
+
+# IntelliJ IDEA - project settings, workspace, run configs
 .idea/
 *.iws
 *.iml
 *.ipr
 
-# OS
+# Eclipse - project files
+.eclipse/
+.classpath
+.project
+.settings/
+
+# NetBeans - project files
+nbproject/
+nbactions.xml
+nbbuild.xml
+
+# Sublime Text - workspace files
+*.sublime-workspace
+*.sublime-project
+
+# Vim - swap files (created when editing files)
+*.swp
+*.swo
+*~
+
+# Emacs - backup files
+\#*#
+/\#*
+
+# Atom - workspace state
+.atom/
+.atom-build.json
+
+# JetBrains Rider
+.idea/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+
+# =============================================================================
+# SECTION 4: ENVIRONMENT & SECRETS
+# =============================================================================
+# ⚠️ CRITICAL: Never commit environment files with real credentials!
+# These patterns catch ALL .env files
+
+# Base .env file (any .env)
+.env
+
+# Local development overrides
+.env.local
+
+# Any .env.*.local pattern (env.development.local, etc.)
+.env.*.local
+
+# Production environment files
+.env.prod
+.env.production
+.env.staging
+.env.development
+
+# Spring Boot property files with credentials
+# ⚠️ These often contain database passwords, API keys
+application-dev.properties
+application-prod.properties
+application-*.properties
+
+# EXCEPT: Keep application-example.properties as template
+!application-example.properties
+
+# Google service account credentials
+credentials.json
+
+# Generic secrets files
+secrets.json
+secrets.yaml
+secret.*
+
+# AWS credentials (if using AWS SDK)
+.aws/
+credentials
+config
+
+# Azure credentials
+azure.json
+
+# Firebase secrets
+firebase-key.json
+
+
+# =============================================================================
+# SECTION 5: OPERATING SYSTEM FILES
+# =============================================================================
+# macOS - Finder thumbnails, folder metadata
 .DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows - thumbnail caches
 Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
 
-# Logs
+# Windows - desktop settings
+desktop.ini
+
+# Linux - temporary files
+.fuse_hidden/
+.directory
+.Trash-*
+
+# Recycle bin across platforms
+$RECYCLE.BIN/
+
+
+# =============================================================================
+# SECTION 6: LOG FILES
+# =============================================================================
+# Generic log files - may contain sensitive data
 *.log
+
+# Application log directories
+logs/
 server/logs/
+client/logs/
 
-# Local state
+# Log rotation files
+*.log.*
+
+# Apache logs
+apache-log.txt
+
+# Nginx logs
+nginx/
+
+
+# =============================================================================
+# SECTION 7: TEMPORARY & CACHE FILES
+# =============================================================================
+# Temporary directories
+.tmp/
+temp/
+tmp/
+
+# Cache directories
+.cache/
+client/.cache/
+
+# ESLint cache (contains file paths)
+.eslintcache
+.eslintcache.*
+
+# Stylelint cache
+.stylelintcache
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Jest coverage cache
+.jest/
+
+# Next.js cache
+.next/
+.nuxt/
+
+# Angular cache
+.angular/
+
+
+# =============================================================================
+# SECTION 8: DATABASE FILES
+# =============================================================================
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+
+# H2 database files (Java embedded DB)
+*.h2.db
+*.h2.trace.db
+
+# PostgreSQL dump files
+*.dump
+*.sql
+
+# MySQL dump files
+*.sql.bak
+
+# MongoDB data (if local)
+data/
+mongodata/
+
+
+# =============================================================================
+# SECTION 9: TESTING & COVERAGE
+# =============================================================================
+# Test coverage reports
+coverage/
+.nyc_output/
+*.lcov
+
+# Jest test results
+test-results/
+
+# Pytest cache
+.pytest_cache/
+
+# PHPUnit coverage
+.phpunit.result.cache
+
+# Istanbul coverage
+.coverage
+coverage.json
+
+
+# =============================================================================
+# SECTION 10: BUILD TOOLS & WRAPPERS
+# =============================================================================
+# Maven wrapper JAR (downloaded automatically)
+.mvn/wrapper/maven-wrapper.jar
+
+# Gradle wrapper and cache
+.gradle/
+gradle/
+
+# Maven local repository (optional - can be large)
+# .m2/
+
+# npm packages stored locally
+# .npm/
+
+
+# =============================================================================
+# SECTION 11: FRAMEWORK SPECIFIC
+# =============================================================================
+# Next.js static export
+out/
+
+# Nuxt output
+.nuxt/
+output/
+
+# SvelteKit build
+.build/
+.vercel/
+.netlify/
+
+# Gatsby public folder
+public/
+
+# Hugo output
+public/
+resources/_gen/
+
+
+# =============================================================================
+# SECTION 12: DOCKER & CONTAINER
+# =============================================================================
+# Docker compose override (may contain local overrides)
+docker-compose.override.yml
+
+# Container logs
+*.log
+
+# Docker volumes (may contain data)
+volumes/
+
+
+# =============================================================================
+# SECTION 13: SECURITY & KEYS
+# =============================================================================
+# SSH keys
+*.pem
+*.key
+*.pub
+.ssh/
+
+# GPG keys
+.gnupg/
+secring.gpg
+
+# JWT secrets (if stored as files)
+jwt-secret.txt
+jwt-key.pem
+
+# SSL certificates
+*.crt
+*.cer
+*.p12
+*.pfx
+ssl/
+
+
+# =============================================================================
+# SECTION 14: MISCELLANEOUS
+# =============================================================================
+# Office temporary files
+~$*
+
+# Archives (optional - may want to keep .zip releases)
+# *.zip
+# *.tar.gz
+# *.rar
+
+# Font files (optional - can be large)
+# *.ttf
+# *.eot
+# *.woff
+# *.woff2
+# *.otf
+
+
+# =============================================================================
+# SECTION 15: LOCAL CONFIGURATION
+# =============================================================================
+# Local overrides (not tracked in version control)
 .local/
+local.properties
 
-# Node (in case any remain)
-node_modules/
-dist/
+# Overrides for specific environments
+local/
+dev/
+development/
+
+
+# =============================================================================
+# NEGATIVE PATTERNS - KEEP THESE FILES!
+# =============================================================================
+# These files should ALWAYS be committed (use ! to negate)
+
+# Keep example/property files as templates
+!application-example.properties
+!.env.example
+!client/.env.example
+
+# Keep configuration templates
+!*.example
+!*.template
+!config.example.*
+
+# Keep README files
+!README*
+!CHANGELOG*
+
+# Keep license files
+!LICENSE*
+!COPYING*
+
+# Keep .gitignore itself (obviously)
+!.gitignore
