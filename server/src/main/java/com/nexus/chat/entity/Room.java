@@ -15,7 +15,9 @@ import java.util.UUID;
 @Table(name = "rooms", indexes = {
     @Index(name = "idx_room_type", columnList = "type"),
     @Index(name = "idx_room_created_by", columnList = "created_by"),
-    @Index(name = "idx_room_created_at", columnList = "created_at")
+    @Index(name = "idx_room_created_at", columnList = "created_at"),
+    @Index(name = "idx_room_type_not_deleted", columnList = "type, is_deleted"),
+    @Index(name = "idx_room_invite_code", columnList = "invite_code")
 })
 @Data
 @NoArgsConstructor

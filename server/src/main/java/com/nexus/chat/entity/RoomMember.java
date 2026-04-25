@@ -10,7 +10,10 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "room_members", uniqueConstraints = {
+@Table(name = "room_members", indexes = {
+    @Index(name = "idx_room_members_room_id", columnList = "room_id"),
+    @Index(name = "idx_room_members_user_id", columnList = "user_id")
+}, uniqueConstraints = {
     @UniqueConstraint(columnNames = {"room_id", "user_id"})
 })
 @Data

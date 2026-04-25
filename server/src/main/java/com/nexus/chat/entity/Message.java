@@ -17,7 +17,9 @@ import java.util.UUID;
 @Table(name = "messages", indexes = {
     @Index(name = "idx_message_room_created", columnList = "room_id, created_at"),
     @Index(name = "idx_message_sender", columnList = "sender_id"),
-    @Index(name = "idx_message_created_at", columnList = "created_at")
+    @Index(name = "idx_message_created_at", columnList = "created_at"),
+    @Index(name = "idx_message_sender_created", columnList = "sender_id, created_at DESC"),
+    @Index(name = "idx_message_room_not_deleted", columnList = "room_id, is_deleted, created_at DESC")
 })
 @Getter
 @Setter
