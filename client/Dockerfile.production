@@ -1,0 +1,125 @@
+# =============================================================================
+# NEXUS CHAT - Production Frontend Dockerfile (Nginx)
+# =============================================================================
+# Production-optimized Dockerfile using Nginx instead of Node.js serve
+# 
+# Benefits:
+# - Much smaller image (~25MB vs ~150MB with Node.js)
+# - Better performance (Nginx is optimized for static file serving)
+# - Built-in HTTP/2 support
+# - Efficient caching and compression
+# 
+# Build: docker build -f client/Dockerfile.production -t nexuschat-frontend:prod ./client
+# Run:   docker run -p 80:80 nexuschat-frontend:prod
+# =============================================================================
+
+# =============================================================================
+# STAGE 1: BUILDER
+# =============================================================================
+# Build the React application with Vite
+FROM node:18-alpine AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files first (dependency caching)
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci --prefer-offline --no-audit --no-fund
+
+# Copy source code
+COPY . .
+
+# =============================================================================
+# BUILD ARGUMENTS
+# =============================================================================
+# These are set at build time and embedded into the built files
+ARG VITE_API_URL=https://your-backend-domain.com/api
+ARG VITE_WEBSOCKET_URL=wss://your-backend-domain.com/ws
+ARG VITE_APP_ENV=production
+
+# Set environment variables for build
+ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_WEBSOCKET_URL=$VITE_WEBSOCKET_URL
+ENV VITE_APP_ENV=$VITE_APP_ENV
+
+# Build production bundle
+RUN npm run build
+
+# =============================================================================
+# STAGE 2: NGINX RUNTIME
+# =============================================================================
+# Use Nginx Alpine for minimal image size
+# Nginx is optimized for serving static files and can proxy API requests
+FROM nginx:alpine AS runtime
+
+# =============================================================================
+# NGINX CONFIGURATION
+# =============================================================================
+# Copy custom nginx configuration
+# This configures:
+# - SPA routing (redirect all routes to index.html)
+# - Gzip compression
+# - Cache headers for static assets
+# - Proxy API requests to backend (optional)
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copy built static files from builder stage
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# =============================================================================
+# SECURITY HARDENING
+# =============================================================================
+# Create non-root user for Nginx
+# Nginx by default runs as root, but we can limit permissions
+RUN chown -R nginx:nginx /usr/share/nginx/html && \
+    chown -R nginx:nginx /var/cache/nginx && \
+    chown -R nginx:nginx /var/log/nginx && \
+    chown -R nginx:nginx /etc/nginx/conf.d && \
+    touch /var/run/nginx.pid && \
+    chown -R nginx:nginx /var/run/nginx.pid
+
+# Switch to non-root user
+USER nginx
+
+# =============================================================================
+# PORT CONFIGURATION
+# =============================================================================
+# Expose port 80 (HTTP)
+# For HTTPS, expose 443 and configure SSL certificates
+EXPOSE 80
+
+# =============================================================================
+# HEALTH CHECK
+# =============================================================================
+# Verify Nginx is responding
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1
+
+# =============================================================================
+# ENTRYPOINT
+# =============================================================================
+# Nginx runs as the main process (no wrapper script needed)
+# The nginx.conf handles SPA routing and optional API proxying
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
+
+# =============================================================================
+# BUILD EXAMPLE
+# =============================================================================
+# Build with production URLs:
+# docker build \
+#   --build-arg VITE_API_URL=https://api.nexuschat.com/api \
+#   --build-arg VITE_WEBSOCKET_URL=wss://ws.nexuschat.com/ws \
+#   --build-arg VITE_APP_ENV=production \
+#   -f client/Dockerfile.production \
+#   -t nexuschat-frontend:prod \
+#   ./client
+#
+# Or build and run:
+# docker build -f client/Dockerfile.production -t nexuschat-frontend:prod ./client
+# docker run -p 80:80 nexuschat-frontend:prod
+#
+# With API proxy (requires backend URL at runtime):
+# docker run -p 80:80 -e API_BACKEND_URL=http://backend:8080 nexuschat-frontend:prod
+# =============================================================================

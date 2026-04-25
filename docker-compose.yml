@@ -1,0 +1,222 @@
+# =============================================================================
+# NEXUS CHAT - Docker Compose for Local Development
+# =============================================================================
+# This file orchestrates all services for local development
+# 
+# Usage:
+#   docker-compose up -d          # Start all services
+#   docker-compose logs -f        # View logs
+#   docker-compose down           # Stop all services
+#   docker-compose down -v        # Stop and remove volumes
+# =============================================================================
+
+services:
+  # =============================================================================
+  # POSTGRESQL DATABASE
+  # =============================================================================
+  # PostgreSQL 15 Alpine - lightweight, production-ready database
+  # Data persists in named volume (postgres_data)
+  postgres:
+    # Use PostgreSQL 15 Alpine for smaller image size
+    image: postgres:15-alpine
+    
+    # Container name for easy reference
+    container_name: nexuschat-postgres
+    
+    # Environment variables for PostgreSQL
+    # These can also be loaded from .env file
+    environment:
+      # Database name (created automatically)
+      POSTGRES_DB: ${DB_NAME:-chatdb}
+      # Database user (should match DB_USERNAME in backend)
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      # Database password (should match DB_PASSWORD in backend)
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    
+    # Port mapping: host:container
+    # Access database from host: localhost:5432
+    ports:
+      - "5432:5432"
+    
+    # Named volume for data persistence
+    # Data survives container restarts
+    # Warning: Data is lost when volume is removed
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    
+    # Health check to ensure database is ready
+    # Backend waits for this before starting
+    healthcheck:
+      # Check if PostgreSQL is accepting connections
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres}"]
+      # Start checking after 10 seconds
+      interval: 10s
+      # Timeout after 5 seconds
+      timeout: 5s
+      # Retry 5 times before marking unhealthy
+      retries: 5
+      # Wait 10 seconds before first check
+      start_period: 10s
+    
+    # Network configuration
+    networks:
+      - nexuschat-network
+    
+    # Restart policy: restart unless stopped manually
+    restart: unless-stopped
+
+  # =============================================================================
+  # BACKEND (Spring Boot)
+  # =============================================================================
+  # Java 17 Spring Boot application
+  # Built from server/Dockerfile
+  backend:
+    # Build from Dockerfile in server directory
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    
+    # Container name
+    container_name: nexuschat-backend
+    
+    # Environment variables passed to the application
+    # These override values in application.properties
+    environment:
+      # Database connection (use service name 'postgres' for Docker networking)
+      DATABASE_URL: jdbc:postgresql://postgres:5432/${DB_NAME:-chatdb}
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      
+      # JWT configuration (REQUIRED - generate your own!)
+      # Generate with: openssl rand -base64 32
+      JWT_SECRET: ${JWT_SECRET:-your-256-bit-secret-change-in-production}
+      
+      # Spring profile
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      
+      # Logging level
+      LOG_LEVEL: ${LOG_LEVEL:-DEBUG}
+    
+    # Port mapping: host:container
+    # Access API from host: http://localhost:8080
+    ports:
+      - "8080:8080"
+    
+    # Dependencies - wait for PostgreSQL to be healthy
+    depends_on:
+      postgres:
+        condition: service_healthy
+    
+    # Health check to verify application is running
+    healthcheck:
+      # Check Spring Boot Actuator health endpoint
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    
+    # Network configuration
+    networks:
+      - nexuschat-network
+    
+    # Restart policy
+    restart: unless-stopped
+
+  # =============================================================================
+  # FRONTEND (React/Vite)
+  # =============================================================================
+  # React application served with serve
+  # Built from client/Dockerfile
+  frontend:
+    # Build from Dockerfile in client directory
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      # Build arguments for environment
+      args:
+        VITE_APP_ENV: development
+    
+    # Container name
+    container_name: nexuschat-frontend
+    
+    # Environment variables for Vite (build-time)
+    environment:
+      # Point to backend service (using Docker networking)
+      VITE_API_URL: http://backend:8080/api
+      VITE_WEBSOCKET_URL: ws://backend:8080/ws
+      VITE_APP_ENV: development
+    
+    # Port mapping: host:container
+    # Access frontend from host: http://localhost:5173
+    ports:
+      - "5173:5173"
+    
+    # Dependencies - wait for backend to be healthy
+    depends_on:
+      backend:
+        condition: service_healthy
+    
+    # Network configuration
+    networks:
+      - nexuschat-network
+    
+    # Restart policy
+    restart: unless-stopped
+
+# =============================================================================
+# VOLUMES
+# =============================================================================
+# Named volumes for data persistence
+volumes:
+  # PostgreSQL data volume
+  # Persists database files between container restarts
+  # To delete: docker volume rm nexuschat-postgres_data
+  postgres_data:
+    driver: local
+
+# =============================================================================
+# NETWORKS
+# =============================================================================
+# Docker bridge network for inter-container communication
+networks:
+  # Bridge network allows containers to communicate by service name
+  # - postgres: accessible at postgres:5432
+  # - backend: accessible at backend:8080
+  # - frontend: accessible at frontend:5173
+  nexuschat-network:
+    driver: bridge
+
+# =============================================================================
+# USAGE NOTES
+# =============================================================================
+# 
+# First time setup:
+#   1. Create .env.local file with your configuration
+#   2. Run: docker-compose up -d --build
+#   3. Wait ~2-3 minutes for first build (dependencies need to download)
+#
+# Starting services:
+#   docker-compose up -d
+#
+# Viewing logs:
+#   docker-compose logs -f          # All services
+#   docker-compose logs -f backend  # Backend only
+#   docker-compose logs -f postgres # PostgreSQL only
+#
+# Stopping services:
+#   docker-compose down             # Keep volumes
+#   docker-compose down -v          # Remove volumes (WARNING: deletes data!)
+#
+# Rebuilding:
+#   docker-compose up -d --build    # Rebuild all
+#   docker-compose up -d --build backend  # Rebuild only backend
+#
+# Accessing services:
+#   - Frontend: http://localhost:5173
+#   - Backend API: http://localhost:8080/api
+#   - PostgreSQL: localhost:5432
+#
+# Database tools:
+#   docker exec -it nexuschat-postgres psql -U postgres -d chatdb
+# =============================================================================

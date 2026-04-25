@@ -1,0 +1,205 @@
+# =============================================================================
+# NEXUS CHAT - Docker Ignore File
+# =============================================================================
+# Files and directories to exclude from Docker build context
+# This reduces build context size and prevents sensitive files from being copied
+# =============================================================================
+
+# =============================================================================
+# VERSION CONTROL
+# =============================================================================
+# Git repository files
+.git
+.gitignore
+
+# =============================================================================
+# IDE AND EDITOR FILES
+# =============================================================================
+# Visual Studio Code
+.vscode/
+.vscode
+*.code-workspace
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Eclipse
+.project
+.classpath
+.settings/
+.workspace/
+
+# NetBeans
+nbproject/
+
+# =============================================================================
+# BUILD OUTPUT
+# =============================================================================
+# Node.js build output
+dist/
+build/
+
+# Maven build output
+target/
+*.class
+*.jar
+*.war
+
+# Gradle build output
+build/
+.gradle/
+
+# Python build output
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+*.egg
+
+# =============================================================================
+# DEPENDENCIES
+# =============================================================================
+# Node.js dependencies (should be installed in container)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Python dependencies
+venv/
+env/
+.venv/
+Pipfile
+Pipfile.lock
+
+# Maven local repository (optional - can be cached in image)
+.m2/
+
+# =============================================================================
+# ENVIRONMENT FILES
+# =============================================================================
+# Environment files contain secrets - never include in image
+.env
+.env.*
+!.env.example
+
+# AWS credentials
+.aws/
+credentials
+*.pem
+
+# Kubernetes secrets
+*.secret
+
+# =============================================================================
+# LOGS
+# =============================================================================
+# Log files
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# =============================================================================
+# OPERATING SYSTEM FILES
+# =============================================================================
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs.db:encryptable
+*.stackdump
+desktop.ini
+
+# Linux
+*~ 
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# =============================================================================
+# TEST AND DEVELOPMENT FILES
+# =============================================================================
+# Test coverage reports
+coverage/
+.nyc_output/
+htmlcov/
+
+# Test files
+test/
+tests/
+__tests__/
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
+
+# Documentation source
+docs/_build/
+site/
+
+# Storybook
+storybook-static/
+
+# =============================================================================
+# TEMPORARY FILES
+# =============================================================================
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.cache/
+
+# Vim
+*.swo
+*.swp
+
+# =============================================================================
+# MISCELLANEOUS
+# =============================================================================
+# License files (optional - include if needed)
+LICENSE
+LICENSE.md
+LICENSE.txt
+
+# Readme files (optional - include if needed)
+README*
+CHANGELOG*
+
+# CI/CD configurations (optional - include if needed)
+.github/
+.gitlab-ci.yml
+.travis.yml
+Jenkinsfile
+
+# Docker files (not needed in build context)
+docker-compose*.yml
+Dockerfile*
+*.dockerfile
+
+# Terraform/IaC (optional)
+*.tf
+*.tfstate
+.terraform/
+
+# Secrets scanning
+.trufflehog/
